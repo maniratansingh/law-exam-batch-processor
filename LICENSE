@@ -1,21 +1,207 @@
-MIT License
+# LICENSE
 
-Copyright (c) 2026 maniratansingh
+## MIT License
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+Copyright (c) 2026
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, subject to the following conditions:
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+---
+
+# CONTRIBUTING
+
+Thank you for considering contributing to **Law Exam Batch Processor**. Contributions are welcome, provided they respect the project’s **exam-safety, legal accuracy, and self-hosted philosophy**.
+
+---
+
+## 1. Contribution Principles (Strict)
+
+All contributions **must**:
+
+* Preserve strict exam-answer formatting
+* Avoid multi-case-law expansion
+* Maintain statute-first priority
+* Remain self-hosted (no SaaS / cloud inference)
+* Avoid prompt dilution or verbosity
+
+Pull requests that weaken exam discipline or introduce chat-style output will not be accepted.
+
+---
+
+## 2. What You Can Contribute
+
+### Accepted Contributions
+
+* Bug fixes
+* Performance optimizations
+* UI/UX improvements (non-distracting)
+* Better domain ranking logic
+* Improved prompt robustness
+* Documentation improvements
+* Dockerization / deployment tooling
+
+### Not Accepted
+
+* Casual Q&A modes
+* Opinion-based legal analysis
+* Multiple case-law expansion
+* Cloud API dependencies
+* Tracking, analytics, or telemetry
+
+---
+
+## 3. Development Setup (Step-by-Step)
+
+### Step 1: Fork the Repository
+
+* Click **Fork** on GitHub
+* Clone your fork locally
+
+```bash
+git clone https://github.com/<your-username>/law-exam-batch-processor.git
+cd law-exam-batch-processor
+```
+
+---
+
+### Step 2: Create a Virtual Environment
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+pip install flask requests ollama
+```
+
+---
+
+### Step 3: System Dependencies
+
+```bash
+sudo apt install pandoc wkhtmltopdf
+```
+
+Ensure:
+
+* `pandoc --version` works
+* `wkhtmltopdf --version` works
+
+---
+
+### Step 4: Local Services
+
+* Ollama running locally
+* Required model pulled:
+
+```bash
+ollama pull gemma3:4b
+```
+
+* SearXNG running and reachable
+* JSON search endpoint enabled
+
+---
+
+## 4. Branching Rules
+
+* Always branch from `main`
+
+```bash
+git checkout -b feature/<short-description>
+```
+
+Examples:
+
+* `feature/ui-progress-fix`
+* `feature/domain-ranking`
+
+---
+
+## 5. Coding Standards
+
+### Backend (Python)
+
+* Follow PEP8
+* No global state mutations without locks
+* All long-running tasks must be threaded
+* No blocking I/O on request thread
+
+### Frontend (HTML/JS)
+
+* No frameworks
+* No external CDNs
+* Plain JavaScript only
+* Exam-safe UI (no animations, no distractions)
+
+---
+
+## 6. Prompt Safety Rules
+
+When modifying prompts:
+
+* Preserve exact section order
+* Preserve single-case-law rule
+* Preserve confidence level output
+* Do NOT add examples or illustrations
+
+Prompt changes must be justified clearly in PR description.
+
+---
+
+## 7. Testing Checklist
+
+Before submitting a PR:
+
+* [ ] App starts without errors
+* [ ] Batch processing completes
+* [ ] Progress polling works
+* [ ] PDF export works
+* [ ] Output format unchanged
+* [ ] No verbosity regression
+
+---
+
+## 8. Commit Message Format
+
+Use clear, professional commits:
+
+```text
+fix: correct domain priority scoring
+feat: add pdf export status guard
+refactor: isolate prompt templates
+```
+
+---
+
+## 9. Pull Request Process
+
+1. Push your branch
+2. Open a PR against `main`
+3. Describe:
+
+   * What changed
+   * Why it is needed
+   * How exam safety is preserved
+4. Reference issues if applicable
+
+Incomplete or vague PRs may be closed without review.
+
+---
+
+## 10. Code of Conduct
+
+* Be respectful
+* Stay technical
+* No legal opinions or political debate
+* No plagiarism
+
+---
+
+## 11. Final Note
+
+This project prioritizes **accuracy, restraint, and examination relevance** over novelty.
+
+If your contribution strengthens those goals, it is welcome.
