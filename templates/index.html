@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Law Exam Batch Processor</title>
+
+<style>
+body {
+    background: #0e1117;
+    color: #e6edf3;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu;
+    margin: 0;
+    padding: 24px;
+}
+.container {
+    max-width: 900px;
+    margin: auto;
+}
+h1 { font-size: 22px; margin-bottom: 6px; }
+.sub { font-size: 13px; color: #9da7b3; margin-bottom: 14px; }
+
+textarea {
+    width: 100%;
+    min-height: 240px;
+    background: #161b22;
+    color: #e6edf3;
+    border: 1px solid #30363d;
+    border-radius: 12px;
+    padding: 14px;
+    font-family: ui-monospace, monospace;
+}
+
+.controls {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 12px;
+}
+.counter { font-size: 13px; color: #8b949e; }
+
+button {
+    background: #1f6feb;
+    color: white;
+    border: none;
+    padding: 10px 22px;
+    border-radius: 999px;
+    font-size: 14px;
+    cursor: pointer;
+}
+button.secondary { background: #2ea043; }
+button:disabled { opacity: 0.45; }
+
+#progressbar {
+    height: 22px;
+    background: #0b0f14;
+    border: 1px solid #30363d;
+    border-radius: 999px;
+    overflow: hidden;
+    margin-top: 18px;
+}
+#progress {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #238636, #2ea043);
+    text-align: center;
+    line-height: 22px;
+    font-size: 12px;
+}
+
+#status {
+    margin-top: 6px;
+    font-size: 13px;
+    color: #9da7b3;
+}
+
+#results {
+    margin-top: 20px;
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 14px;
+    max-height: 520px;
+    overflow-y: auto;
+}
+.qblock { padding: 14px; border-bottom: 1px solid #30363d; }
+.qtitle { font-weight: 600; }
+.answer { margin-top: 8px; display: none; white-space: pre-wrap; }
+.qblock.done .answer { display: block; }
+.waiting { color: #8b949e; font-style: italic; }
+</style>
+
+<script>
+let state = { taskId: null, poller: null, finalPdf: null };
+
+function $(id){ return document.getElementById(id); }
+
+function parseQuestions(t){
+    return t.split(/\r?\n+/).map(q=>q.trim()).filter(Boolean);
+}
+
+function updateCounter(){
+    $("counter").innerText =
+        parseQuestions($("questions").value).length + " questions";
+}
+
+function renderPlaceholders(questions){
+    $("results").innerHTML = "";
+    questions.forEach((q,i)=>{
+        const d=document.createElement("div");
+        d.className="qblock";
+        d.id="q"+i;
+        d.innerHTML=`
+          <div class="qtitle">Q${i+1}: ${q}</div>
+          <div class="answer waiting">Processing…</div>`;
+        $("results").appendChild(d);
+    });
+}
+
+function renderAnswers(answers){
+    answers.forEach((ans,i)=>{
+        if(!ans) return;
+        const block=$("q"+i);
+        if(!block || block.classList.contains("done")) return;
+        const a=block.querySelector(".answer");
+        a.textContent=ans;
+        a.classList.remove("waiting");
+        block.classList.add("done");
+    });
+}
+
+function updateProgress(c,t){
+    const pct=Math.floor((c/t)*100);
+    $("progress").style.width=pct+"%";
+    $("progress").innerText=pct+"%";
+    $("status").innerText=`Processed ${c} of ${t}`;
+}
+
+function pollTask(){
+    fetch("/progress/"+state.taskId)
+    .then(r=>r.json())
+    .then(d=>{
+        updateProgress(d.current,d.total);
+        renderAnswers(d.answers);
+
+        if(d.current===d.total && d.final_pdf){
+            clearInterval(state.poller);
+            state.finalPdf=d.final_pdf;
+            $("exportBtn").disabled=false;
+            $("status").innerText="Completed · Ready to export PDF";
+        }
+    });
+}
+
+function runBatch(){
+    const questions=parseQuestions($("questions").value);
+    if(!questions.length) return alert("No questions");
+
+    renderPlaceholders(questions);
+    $("runBtn").disabled=true;
+    $("exportBtn").disabled=true;
+
+    fetch("/exam",{
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body:JSON.stringify({questions})
+    }).then(r=>r.json()).then(d=>{
+        state.taskId=d.task_id;
+        state.poller=setInterval(pollTask,1200);
+    });
+}
+
+function exportFinalPDF(){
+    if(state.finalPdf)
+        window.open("/download/pdf/"+state.finalPdf,"_blank");
+}
+
+document.addEventListener("DOMContentLoaded",()=>{
+    $("questions").addEventListener("input",updateCounter);
+    $("runBtn").onclick=runBatch;
+    $("exportBtn").onclick=exportFinalPDF;
+});
+</script>
+</head>
+
+<body>
+<div class="container">
+<h1>Law Exam Batch Processor</h1>
+<div class="sub">One question per line · Fact-checked · Single PDF</div>
+
+<textarea id="questions"></textarea>
+
+<div class="controls">
+  <div class="counter" id="counter">0 questions</div>
+  <div>
+    <button id="runBtn">Run</button>
+    <button id="exportBtn" class="secondary" disabled>Export Final PDF</button>
+  </div>
+</div>
+
+<div id="progressbar"><div id="progress">0%</div></div>
+<div id="status"></div>
+<div id="results"></div>
+</div>
+</body>
+</html>
